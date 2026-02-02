@@ -51,6 +51,22 @@ constexpr uint8_t DIGIT_PATTERNS[16] = {
 // Decimal point bit
 constexpr uint8_t DECIMAL_POINT = 0x80;
 
+// Individual segment bits for 7-segment display
+//     AAA
+//    F   B
+//    F   B
+//     GGG
+//    E   C
+//    E   C
+//     DDD
+constexpr uint8_t SEG_A = 0x01;  // Top
+constexpr uint8_t SEG_B = 0x02;  // Top-right
+constexpr uint8_t SEG_C = 0x04;  // Bottom-right
+constexpr uint8_t SEG_D = 0x08;  // Bottom
+constexpr uint8_t SEG_E = 0x10;  // Bottom-left
+constexpr uint8_t SEG_F = 0x20;  // Top-left
+constexpr uint8_t SEG_G = 0x40;  // Middle
+
 HT16K33::HT16K33(i2c_inst_t* i2c_instance) : i2cAddress(HT16K33_I2C_ADDRESS), i2c(i2c_instance) {
     memset(displayBuffer, 0, sizeof(displayBuffer));
 }
@@ -155,6 +171,106 @@ void HT16K33::clear() {
     writeDisplay();
 }
 
+void HT16K33::setColon(bool on) {
+    // The colon is at address 0x04 in the display buffer
+    // On the Adafruit 7-segment backpack, bit 1 (0x02) controls the colon
+    if (on) {
+        displayBuffer[4] = 0x02;
+    } else {
+        displayBuffer[4] = 0x00;
+    }
+}
+
+void HT16K33::testDisplay() {
+    // Light up all segments on all digits including colon
+    for (uint8_t i = 0; i < 4; ++i) {
+        displayDigit(i, 8, true); // 8 lights up all segments, true adds decimal point
+    }
+    setColon(true);  // Turn on the colon
+    writeDisplay();
+    sleep_ms(1000); // Keep it lit for 1 second
+    clear();
+    displayOutlineChase();
+}
+
+void HT16K33::setSegment(uint8_t position, uint8_t segmentMask) {
+    // Validate position (0-3 for 4-digit display)
+    if (position >= 4) {
+        return;
+    }
+    
+    // Calculate address (skip colon at 0x04)
+    uint8_t address;
+    if (position < 2) {
+        address = position * 2;
+    } else {
+        address = (position * 2) + 2;
+    }
+    
+    displayBuffer[address] = segmentMask;
+}
+
+void HT16K33::displayOutlineChase() {
+    // Part 1: Light up the outer rectangle of the display for 1 second
+    // Digit 0 (leftmost): A, F, E, D (top, left side, bottom)
+    // Digit 1: A, D (top, bottom)
+    // Digit 2: A, D (top, bottom)
+    // Digit 3 (rightmost): A, B, C, D (top, right side, bottom)
+    
+    clear();
+    setSegment(0, SEG_A | SEG_F | SEG_E | SEG_D);  // Left digit: top, left edges, bottom
+    setSegment(1, SEG_A | SEG_D);                   // Second digit: top, bottom
+    setSegment(2, SEG_A | SEG_D);                   // Third digit: top, bottom
+    setSegment(3, SEG_A | SEG_B | SEG_C | SEG_D);  // Right digit: top, right edges, bottom
+    writeDisplay();
+    sleep_ms(1000);
+    
+    // Part 2: LED chase clockwise from top-left, one LED at a time
+    // Chase sequence (clockwise from top-left):
+    // 1. Digit 0, segment A (top-left, top)
+    // 2. Digit 1, segment A
+    // 3. Digit 2, segment A
+    // 4. Digit 3, segment A (top-right, top)
+    // 5. Digit 3, segment B (top-right corner)
+    // 6. Digit 3, segment C (bottom-right corner)
+    // 7. Digit 3, segment D (bottom-right, bottom)
+    // 8. Digit 2, segment D
+    // 9. Digit 1, segment D
+    // 10. Digit 0, segment D (bottom-left, bottom)
+    // 11. Digit 0, segment E (bottom-left corner)
+    // 12. Digit 0, segment F (top-left corner) - back to start
+    
+    struct ChaseStep {
+        uint8_t position;
+        uint8_t segment;
+    };
+    
+    constexpr ChaseStep chaseSequence[] = {
+        {0, SEG_A},  // Top of digit 0
+        {1, SEG_A},  // Top of digit 1
+        {2, SEG_A},  // Top of digit 2
+        {3, SEG_A},  // Top of digit 3
+        {3, SEG_B},  // Top-right of digit 3
+        {3, SEG_C},  // Bottom-right of digit 3
+        {3, SEG_D},  // Bottom of digit 3
+        {2, SEG_D},  // Bottom of digit 2
+        {1, SEG_D},  // Bottom of digit 1
+        {0, SEG_D},  // Bottom of digit 0
+        {0, SEG_E},  // Bottom-left of digit 0
+        {0, SEG_F},  // Top-left of digit 0
+    };
+    
+    constexpr size_t chaseLength = sizeof(chaseSequence) / sizeof(chaseSequence[0]);
+    
+    for (size_t i = 0; i < chaseLength; ++i) {
+        clear();
+        setSegment(chaseSequence[i].position, chaseSequence[i].segment);
+        writeDisplay();
+        sleep_ms(250);  // Quarter second per step
+    }
+    
+    clear();
+}
 
 
 }  // namespace ht16k33

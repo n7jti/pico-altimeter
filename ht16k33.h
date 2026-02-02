@@ -15,10 +15,15 @@ public:
     void setBrightness(uint8_t brightness);
     void setBlinkRate(uint8_t rate);
     void displayDigit(uint8_t position, uint8_t digit, bool dot = false);
+    void setColon(bool on);
     void writeDisplay();
     void clear();
 
+    void testDisplay();
+    void displayOutlineChase();
+
 private:
+    void setSegment(uint8_t position, uint8_t segmentMask);
     uint8_t displayBuffer[16];
     uint8_t i2cAddress;
     i2c_inst_t* i2c;

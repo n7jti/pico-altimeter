@@ -15,6 +15,9 @@ int main()
     ht16k33::HT16K33 display(i2c1);
     display.begin();
 
+    // Test the display
+    display.testDisplay();
+
     while (true) {
         display.displayDigit(0, 0xB, false); 
         display.displayDigit(1, 0xA, false); 
@@ -31,5 +34,8 @@ int main()
         display.writeDisplay();
         printf("0xF00D\n");
         sleep_ms(1000);
+
+        display.displayOutlineChase();
+
     }
 }
