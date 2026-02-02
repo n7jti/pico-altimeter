@@ -272,5 +272,30 @@ void HT16K33::displayOutlineChase() {
     clear();
 }
 
+void HT16K33::displayNumber(int number, int decimalPos) {
+    // Handle negative numbers - display absolute value
+    if (number < 0) {
+        number = -number;
+    }
+    
+    // Clamp to 4 digits
+    if (number > 9999) {
+        number = 9999;
+    }
+    
+    // Extract digits
+    int thousands = number / 1000;
+    int hundreds = (number / 100) % 10;
+    int tens = (number / 10) % 10;
+    int ones = number % 10;
+    
+    // Display each digit
+    displayDigit(0, thousands, decimalPos == 0);
+    displayDigit(1, hundreds, decimalPos == 1);
+    displayDigit(2, tens, decimalPos == 2);
+    displayDigit(3, ones, decimalPos == 3);
+    writeDisplay();
+}
+
 
 }  // namespace ht16k33

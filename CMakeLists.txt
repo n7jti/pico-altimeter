@@ -39,7 +39,9 @@ add_executable(pico-altimeter
     main.cpp
     pins.cpp
     encoder.cpp
-    ht16k33.cpp )
+    ht16k33.cpp 
+    bmp390.cpp
+    bmp3.c)
 
 pico_set_program_name(pico-altimeter "pico-altimeter")
 pico_set_program_version(pico-altimeter "0.1")

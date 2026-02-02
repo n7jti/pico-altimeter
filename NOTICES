@@ -1,0 +1,24 @@
+pico-altimeter
+Copyright (c) 2026 Alan Ludwig
+
+This product includes software developed by Alan Ludwig and is licensed under
+the MIT License. See LICENSE for the full license text.
+
+================================================================================
+THIRD-PARTY NOTICES
+================================================================================
+
+This software may include third-party components with separate copyright
+notices and license terms. Your use of these components is subject to the
+terms and conditions of each component's license.
+
+See the THIRD-PARTY-LICENSES directory for complete license texts.
+
+--------------------------------------------------------------------------------
+BMP3 Sensor API
+Copyright (c) 2022 Bosch Sensortec GmbH
+License: BSD-3-Clause
+Files: bmp3.c, bmp3.h, bmp3_defs.h
+Source: https://github.com/boschsensortec/BMP3_SensorAPI
+--------------------------------------------------------------------------------
+

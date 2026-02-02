@@ -15,6 +15,7 @@ public:
     void setBrightness(uint8_t brightness);
     void setBlinkRate(uint8_t rate);
     void displayDigit(uint8_t position, uint8_t digit, bool dot = false);
+    void displayNumber(int number, int decimalPos = -1);
     void setColon(bool on);
     void writeDisplay();
     void clear();
