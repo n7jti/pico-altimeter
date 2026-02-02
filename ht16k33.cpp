@@ -1,4 +1,4 @@
-// // (C) Alan Ludwig 2026, all rights reserved.
+//(C)  Alan Ludwig 2026, all rights reserved.
 
 #include "ht16k33.h"
 #include "pico/stdlib.h"

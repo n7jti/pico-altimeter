@@ -37,6 +37,8 @@ pico_sdk_init()
 
 add_executable(pico-altimeter 
     main.cpp
+    pins.cpp
+    encoder.cpp
     ht16k33.cpp )
 
 pico_set_program_name(pico-altimeter "pico-altimeter")
