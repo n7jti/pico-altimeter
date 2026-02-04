@@ -41,7 +41,9 @@ add_executable(pico-altimeter
     encoder.cpp
     ht16k33.cpp 
     bmp390.cpp
-    bmp3.c)
+    bmp3.c
+    event.cpp
+    timer.cpp)
 
 pico_set_program_name(pico-altimeter "pico-altimeter")
 pico_set_program_version(pico-altimeter "0.1")
